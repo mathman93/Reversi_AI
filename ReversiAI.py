@@ -5,12 +5,18 @@
 
 import math
 
+board_size = 8 # 8x8 board
+board_squares = board_size ** 2
+board_state = ""
+
 def main():
-    pass
+    print("Starting Position:")
+    PrintBoard()
+    #print(board_squares)
 # End def main
 
 def PrintBoard():
-    board_size = 8 # 8x8 board
+    square = 0
     for r in range(2*board_size + 1): # Row counter
         row_string = ""
         for c in range(2*board_size + 1): # Column counter
@@ -20,6 +26,7 @@ def PrintBoard():
                 row_string += "|" # vertical lines
             else:
                 row_string += " " # pieces
+                square += 1
             # End if
         print(row_string)
         # End for column
@@ -29,7 +36,5 @@ def PrintBoard():
 # End def PrintBoard
 
 ## Main Code
-print("Starting Position:")
-PrintBoard()
-
+main()
 print("End")
