@@ -48,8 +48,8 @@ def PrintBoard(b, w):
                 # End if
                 square += 1
             # End if
-        print(row_string)
         # End for column
+        print(row_string)
     # End for row
 
     print("") # Space after board layout
