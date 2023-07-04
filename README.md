@@ -1,2 +1,2 @@
 # Reversi_AI
-AI project to play Reversi
+An AI project to play Reversi, written in Python.
