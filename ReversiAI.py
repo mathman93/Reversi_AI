@@ -18,19 +18,26 @@ for row in row_names:
 
 def main():
     [black_stones, white_stones] = InitializeBoard()
-    #[black_total, white_total] = CountStones(black_stones, white_stones)
-    #print("{0} - {1}".format(black_total, white_total))
     print("Starting Position:")
     PrintBoard(black_stones, white_stones)
     
     # Make move until end of game
     player_to_move = 0
-    for move_number in range(2):
+    for move_number in range(20):
         [black_stones, white_stones] = MakeMove(player_to_move, black_stones, white_stones)
         PrintBoard(black_stones, white_stones)
         player_to_move = ~player_to_move # Switch turns
     # End for move_number
     
+    [black_total, white_total] = CountStones(black_stones, white_stones)
+    print("Black: {0} - White: {1}".format(black_total, white_total))
+    if (black_total == white_total):
+        print("It's a tie! Good game.")
+    elif (black_total > white_total):
+        print("Black wins! Good game.")
+    else:
+        print("White wins! Good game.")
+    # End if
 # End main
 
 # Sets initial configuration for the game board
@@ -52,27 +59,107 @@ def MakeMove(player, b, w):
     else: # player == 1
         print("White (O) to move...")
     # End if
+
     # Determine possible moves
-    pass
+    valid_dictionary = DetermineMoves(player, b, w)
+    #print(valid_positions) # for testing
+    print(valid_dictionary) # for testing
+    valid_positions = [board_positions[x] for x in valid_dictionary.keys()]
+
     # Have player choose a move
     while True:
         move_choice = input("Select a Move: ").upper()
-        if move_choice in board_positions:
+        if move_choice in valid_positions:
             break
         else: # Not a valid move
             print("Not a valid move. Please try again.")
+            print("Valid positions: {0}".format(valid_positions))
     # End while
+    
+
+    # Update Board state
     move_shift = board_positions.index(move_choice) # Get board position index (0-63) of move choice
     if (player == 0):
-        b |= (1 << move_shift) # Add black stone to state
-        w &= ~(1 << move_shift) # Remove white stone from state (Not necessary if pre-checking valid moves)
-        # (will be necessary for switching stone colors on capture)
-    else: # player == 1
+        b |= (1 << move_shift) # add player's move to state
+        for flips in valid_dictionary[move_shift]:
+            # Swap opponents stones to player's stones
+            b |= (1 << flips)
+            w &= ~(1 << flips)
+        # End for
+    else:
         w |= (1 << move_shift)
-        b &= ~(1 << move_shift)
+        for flips in valid_dictionary[move_shift]:
+            w |= (1 << flips)
+            b &= ~(1 << flips)
+        # End for
     # End if
+
+    # Return updated board state
     return [b, w]
 # End MakeMove
+
+def DetermineMoves(player, b, w):
+    valid_moves = [] # Set of valid moves that the player can make
+    valid_move_dict = {} # Dictionary of valid moves and flipped spaces for valid moves
+    if (player == 0):
+        player_state = b
+        opponent_state = w
+    else:
+        player_state = w
+        opponent_state = b
+    # End if
+    ps_index = [] # player_state_index
+    os_index = [] # opponent_state_index
+    for shift in range(64):
+        if ((player_state >> shift)%2 == 1):
+            ps_index.append(shift)
+        # End if
+        if ((opponent_state >> shift)%2 == 1):
+            os_index.append(shift)
+        # End if
+    # End for shift
+    for spot in os_index: # valid moves will be next to the opponent's piece
+        for offset in [-9,-8,-7,1,9,8,7,-1]:
+            valid = False # flag to determine if spot_to_check is a valid square
+            spot_to_check = spot + offset
+            if (spot_to_check in range(64)) and (spot_to_check not in ps_index) and (spot_to_check not in os_index):
+                # Bug: Need to check that spot_opposite doesn't wrap around the board
+                spot_opposite = spot - offset
+                flip_spots = [spot]
+                while True:
+                    if (spot_opposite in range(64)) and (spot_opposite in os_index):
+                        # Need to check next spot over (repeat loop)
+                        flip_spots.append(spot_opposite)
+                        spot_opposite -= offset
+                        continue
+                    elif (spot_opposite in range(64)) and (spot_opposite in ps_index):
+                        # spot_to_check is valid move for current player to make
+                        valid = True
+                        break
+                        # flip_spots will be switched when move is made
+                    else: # spot_opposite is either off the board or is empty
+                        break # not a valid spot to check
+                    # End if
+                # End while
+            else:
+                continue # not a valid spot to check
+            # End if
+            if (valid == True):
+                # Add spot_to_check to list of valid moves
+                valid_moves.append(spot_to_check)
+                if (spot_to_check in valid_move_dict.keys()):
+                    for x in valid_move_dict[spot_to_check]:
+                        flip_spots.append(x)
+                    #flip_spots.append([x for x in valid_move_dict[spot_to_check]])
+                    # End for x
+                # End if
+                valid_move_dict[spot_to_check] = flip_spots
+            # End if
+        # End for offset
+    # End for
+    #valid_positions = [board_positions[x] for x in valid_move_dict.keys()]
+    return valid_move_dict
+# End DetermineMoves
 
 def CountStones(b, w):
     black_count = 0 # Total number of black stones
