@@ -3,8 +3,6 @@
 # Last Updated: 7/4/2023
 # Author: Timothy Anglea
 
-# import math
-
 # Global Variables
 board_size = 8 # 8x8 board
 board_positions = [] # possible board selections
@@ -15,20 +13,33 @@ for row in row_names:
         board_positions.append(row+column)
     # End for column
 # End for row
+board_coord = [] # possible board coordinates tuples
+for i in range(64):
+    board_coord.append((i//8, i%8))
+# End for i
 
+# Main function for playing game
 def main():
-    [black_stones, white_stones] = InitializeBoard()
+    [black_stones, white_stones] = InitializeBoard() # Place starting stones
     print("Starting Position:")
     PrintBoard(black_stones, white_stones)
-    
+
     # Make move until end of game
-    player_to_move = 0
-    for move_number in range(20):
-        [black_stones, white_stones] = MakeMove(player_to_move, black_stones, white_stones)
+    for move_number in range(120):
+        [black_stones, white_stones] = MakeMove(move_number%2, black_stones, white_stones)
         PrintBoard(black_stones, white_stones)
-        player_to_move = ~player_to_move # Switch turns
+        
+        # End conditions
+        if (black_stones | white_stones == 0xffffffffffffffff):
+            break # Board is filled
+        elif (black_stones == 0x0 or white_stones == 0x0):
+            break # A player has no more stones
+        # End if
+
+        # Switch turns and continue
     # End for move_number
     
+    # Declare winner
     [black_total, white_total] = CountStones(black_stones, white_stones)
     print("Black: {0} - White: {1}".format(black_total, white_total))
     if (black_total == white_total):
@@ -41,6 +52,9 @@ def main():
 # End main
 
 # Sets initial configuration for the game board
+# Returns:
+#   b = int; bit map of black stones on the board
+#   w = int; bit map of white stones on the board
 def InitializeBoard():
     # Starting position for game
     b = 0x0000001008000000
@@ -52,6 +66,14 @@ def InitializeBoard():
     return [b, w]
 # End InitializeBoard
 
+# Prompt user to make a move
+# Parameters:
+#   player = 0/1; Player number (0 = black, 1 = white)
+#   b = int; Current bit map of black stones on the board
+#   w = int; Current bit map of white stones on the board
+# Returns:
+#   b = int; Updated bit map of black stones on the board
+#   w = int; Updated bit map of white stones on the board
 def MakeMove(player, b, w):
     # "player" = 0 for black, 1 for white
     if (player == 0):
@@ -62,9 +84,13 @@ def MakeMove(player, b, w):
 
     # Determine possible moves
     valid_dictionary = DetermineMoves(player, b, w)
-    #print(valid_positions) # for testing
-    print(valid_dictionary) # for testing
+    #print(valid_dictionary) # for testing
     valid_positions = [board_positions[x] for x in valid_dictionary.keys()]
+    #print(valid_positions) # for testing
+    if (len(valid_positions) == 0): # no valid moves for player
+        print("No valid moves: Pass")
+        return [b, w] # Return current state of board (no modifications)
+    # End if
 
     # Have player choose a move
     while True:
@@ -73,10 +99,15 @@ def MakeMove(player, b, w):
             break
         else: # Not a valid move
             print("Not a valid move. Please try again.")
-            print("Valid positions: {0}".format(valid_positions))
+            message_string = "Valid positions are "
+            for v in valid_positions:
+                message_string += v
+                message_string += "; "
+            # End for v
+            print(message_string)
+        # End if
     # End while
     
-
     # Update Board state
     move_shift = board_positions.index(move_choice) # Get board position index (0-63) of move choice
     if (player == 0):
@@ -98,6 +129,14 @@ def MakeMove(player, b, w):
     return [b, w]
 # End MakeMove
 
+def AddTuples(x,y):
+    return tuple(map(lambda i, j: i + j, x, y))
+# End AddTuple
+
+def SubTuples(x,y):
+    return tuple(map(lambda i, j: i - j, x, y))
+# End AddTuple
+
 def DetermineMoves(player, b, w):
     valid_moves = [] # Set of valid moves that the player can make
     valid_move_dict = {} # Dictionary of valid moves and flipped spaces for valid moves
@@ -112,27 +151,31 @@ def DetermineMoves(player, b, w):
     os_index = [] # opponent_state_index
     for shift in range(64):
         if ((player_state >> shift)%2 == 1):
-            ps_index.append(shift)
+            ps_index.append(board_coord[shift])
         # End if
         if ((opponent_state >> shift)%2 == 1):
-            os_index.append(shift)
+            os_index.append(board_coord[shift])
         # End if
     # End for shift
     for spot in os_index: # valid moves will be next to the opponent's piece
-        for offset in [-9,-8,-7,1,9,8,7,-1]:
+        #for offset in [-9,-8,-7,1,9,8,7,-1]:
+        for offset in [(-1,-1), (-1,0), (-1,1), (0,-1), (0,1), (1,-1), (1,0), (1,1)]:
             valid = False # flag to determine if spot_to_check is a valid square
-            spot_to_check = spot + offset
-            if (spot_to_check in range(64)) and (spot_to_check not in ps_index) and (spot_to_check not in os_index):
+            spot_to_check = AddTuples(spot, offset)
+            #spot_to_check = spot + offset
+            if (spot_to_check in board_coord) and (spot_to_check not in ps_index) and (spot_to_check not in os_index):
                 # Bug: Need to check that spot_opposite doesn't wrap around the board
-                spot_opposite = spot - offset
-                flip_spots = [spot]
+                spot_opposite = SubTuples(spot, offset)
+                #spot_opposite = spot - offset
+                flip_spots = [board_coord.index(spot)]
                 while True:
-                    if (spot_opposite in range(64)) and (spot_opposite in os_index):
+                    if (spot_opposite in board_coord) and (spot_opposite in os_index):
                         # Need to check next spot over (repeat loop)
-                        flip_spots.append(spot_opposite)
-                        spot_opposite -= offset
+                        flip_spots.append(board_coord.index(spot_opposite))
+                        spot_opposite = SubTuples(spot_opposite, offset)
+                        #spot_opposite -= offset
                         continue
-                    elif (spot_opposite in range(64)) and (spot_opposite in ps_index):
+                    elif (spot_opposite in board_coord) and (spot_opposite in ps_index):
                         # spot_to_check is valid move for current player to make
                         valid = True
                         break
@@ -146,14 +189,15 @@ def DetermineMoves(player, b, w):
             # End if
             if (valid == True):
                 # Add spot_to_check to list of valid moves
-                valid_moves.append(spot_to_check)
-                if (spot_to_check in valid_move_dict.keys()):
-                    for x in valid_move_dict[spot_to_check]:
+                spot_coord = board_coord.index(spot_to_check)
+                valid_moves.append(spot_coord)
+                if (spot_coord in valid_move_dict.keys()):
+                    for x in valid_move_dict[spot_coord]:
                         flip_spots.append(x)
                     #flip_spots.append([x for x in valid_move_dict[spot_to_check]])
                     # End for x
                 # End if
-                valid_move_dict[spot_to_check] = flip_spots
+                valid_move_dict[spot_coord] = flip_spots
             # End if
         # End for offset
     # End for
@@ -186,7 +230,7 @@ def PrintBoard(b, w):
         if (c%2 == 1):
             row_string += column_names[c >> 1]
         else:
-            row_string += " " # Space
+            row_string += "   " # Space
         # End if
     # End for c
     print(row_string)
@@ -201,9 +245,9 @@ def PrintBoard(b, w):
         # End if
         for c in range(2*board_size + 1): # Column counter
             if (r%2 == 0):
-                row_string += "-" # horizontal lines
+                row_string += "--" # horizontal lines
             elif (c%2 == 0):
-                row_string += "|" # vertical lines
+                row_string += " | " # vertical lines
             else: # game pieces
                 if ((b >> square) % 2== 1):
                     row_string += "X" # black stone
