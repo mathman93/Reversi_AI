@@ -57,8 +57,8 @@ def main():
 #   w = int; bit map of white stones on the board
 def InitializeBoard():
     # Starting position for game
-    b = 0x0000001008000000
-    w = 0x0000000810000000
+    w = 0x0000001008000000
+    b = 0x0000000810000000
     # basic check for board state
     if (b & w > 0):
         print("ERROR: two stones on same square")
