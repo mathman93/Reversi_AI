@@ -4,6 +4,7 @@
 # Author: Timothy Anglea
 
 from ReversiClasses import GameBoard
+import random
 
 # Main function for playing game
 def main():
@@ -32,7 +33,7 @@ def main():
 
         # White's turn
         print("White (O) to move...")
-        [board.white, board.black, wp] = Move(board.white, board.black, board.board_positions)
+        [board.white, board.black, wp] = RandomMove(board.white, board.black, board.board_positions)
         board.PrintBoard()
 
         # End conditions
@@ -66,6 +67,8 @@ def Move(player, opponent, board_positions):
         return [player, opponent, True] # No valid moves for player, and they must pass
     # End if
 
+    print(valid_positions)
+    print(valid_dictionary.keys())
     # Have player choose a move
     while True:
         move_choice = input("Select a Move: ").upper()
@@ -83,6 +86,77 @@ def Move(player, opponent, board_positions):
         # End if
     # End while
 
+    # Update Board state
+    move_shift = board_positions.index(move_choice) # Get board position index (0-63) of move choice
+    player |= (1 << move_shift) # add player's move to state
+    for flips in valid_dictionary[move_shift]:
+        # Swap opponents stones to player's stones
+        player |= (1 << flips)
+        opponent &= ~(1 << flips)
+    # End for
+
+    # Return updated state; a valid move was made
+    return [player, opponent, False]
+
+# End Move
+
+# Select a random move and update the state of the board (dumbAI)
+# Parameters:
+#   player = int; current state of stones of player who is next to make a move
+#   opponent = int; current state of opponent's stones
+#   board_positions = list; all names of spaces on board
+# Returns:
+#   player = int; updated state of player's stones
+#   opponent = int; updated state of opponent's stones
+#   boolean; whether the player had to pass due to no possible valid moves (True = pass)
+def RandomMove(player, opponent, board_positions):
+
+    [valid_dictionary, valid_positions] = FindMoves(player, opponent, board_positions)
+    if (len(valid_positions) == 0):
+        print("No valid moves: Pass")
+        return [player, opponent, True] # No valid moves for player, and they must pass
+    # End if
+
+    # Select random move from valid_positions
+    #move_choice = random.choice(valid_positions)
+    
+    # Select move with most possible flips (choose randomly if multiple)
+    move_choices = [] # list of reduced move choices
+    max_length = 0 # Start low to increase later
+    for move in valid_dictionary.keys():
+        current_length = len(valid_dictionary[move])
+        if (current_length > max_length):
+            max_length = len(valid_dictionary[move])
+            move_choices = [] # reset move_choices
+            move_choices.append(board_positions[move]) # reset move choices
+        elif (current_length < max_length):
+            continue # skip this move
+        else: # move has same legnth as previous maximum
+            move_choices.append(board_positions[move]) # add extra move to list
+            # max_length remains unchanged
+        # End if
+    # End for
+    move_choice = random.choice(move_choices)
+
+    # Select move with least possible flips (choose randomly if multiple)
+    # move_choices = [] # list of reduced move choices
+    # min_length = 30 # Start high to decrease later
+    # for move in valid_dictionary.keys():
+    #     current_length = len(valid_dictionary[move])
+    #     if (current_length < min_length):
+    #         min_length = len(valid_dictionary[move])
+    #         move_choices = [] # reset move_choices
+    #         move_choices.append(board_positions[move]) # reset move choices
+    #     elif (current_length > min_length):
+    #         continue # skip this move
+    #     else: # move has same legnth as previous maximum
+    #         move_choices.append(board_positions[move]) # add extra move to list
+    #         # max_length remains unchanged
+    #     # End if
+    # # End for
+    # move_choice = random.choice(move_choices)
+
+    print("Move selected: {0}".format(move_choice))
     # Update Board state
     move_shift = board_positions.index(move_choice) # Get board position index (0-63) of move choice
     player |= (1 << move_shift) # add player's move to state
