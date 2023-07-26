@@ -1,7 +1,11 @@
 # ReversiAI.py
 # Purpose: To play Reversi optimally
-# Last Updated: 7/23/2023
+# Last Updated: 7/26/2023
 # Author: Timothy Anglea
+# List of things to update:
+# 1. Simplify Move() functions by moving redundant parts to a class
+# 2. Create way to choose type of play (vs. CPU; CPUvCPU; etc.)
+# 3. Determine way to look ahead at state of board based on move choice
 
 from ReversiClasses import GameBoard
 import random
