@@ -23,7 +23,7 @@ class GameBoard:
     # End __init__
 
     # Sets initial configuration for the game board
-    # Returns:
+    # Parameters:
     #   b = int; bit map of black stones on the board
     #   w = int; bit map of white stones on the board
     def InitializeBoard(self, b = None, w = None):
@@ -36,16 +36,15 @@ class GameBoard:
             self.white = w
         # End if
 
-        # basic check for board state
+        # basic check for board state (NEEDED HERE?)
         if (self.black & self.white > 0):
             print("ERROR: two stones on same square")
         # End if
     # End InitializeBoard
 
-    # Finds valid moves for player (p) given state of board
+    # Finds valid moves for player given state of board
     # Parameters:
-    #   p = int; bit map of stones for player who is to make a move
-    #   o = int; bit map of opponent's stones
+    #   player = int; player who is making the next (valid) move
     # Returns:
     #   valid_move_dict = dictionary; dictionary of stones that would be flipped for a given valid move
     #   valid_moves_list = list; list of valid moves in the form of board position labels

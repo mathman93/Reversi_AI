@@ -3,7 +3,7 @@
 # Last Updated: 7/26/2023
 # Author: Timothy Anglea
 # List of things to update:
-# 1. Simplify Move() functions by moving redundant parts to a class
+# 1. Should valid_dictionary just be a class variable for Board?
 # 2. Create way to choose type of play (vs. CPU; CPUvCPU; etc.)
 # 3. Determine way to look ahead at state of board based on move choice
 
@@ -29,11 +29,10 @@ def main():
             print("No valid moves: Pass")
             bp = True
         else: # Have person pick a move
-            move_choice = Move(valid_dictionary, valid_positions)
+            move_choice = MaxMove(valid_dictionary, valid_positions)
             # Update pieces based on move_choice
             board.Update(player, move_choice, valid_dictionary)
         # End if
-                
         board.PrintBoard()
 
         # End conditions
@@ -54,7 +53,7 @@ def main():
             print("No valid moves: Pass")
             wp = True
         else: # Have person pick a move
-            move_choice = RandomMove(valid_dictionary, valid_positions)
+            move_choice = MinMove(valid_dictionary, valid_positions)
             # Update pieces based on move_choice
             board.Update(player, move_choice, valid_dictionary)
         # End if
@@ -112,42 +111,70 @@ def RandomMove(valid_dictionary, valid_positions):
     move_numbers = [x for x in valid_dictionary.keys()]
     # Select random move from valid_positions
     move_choice = random.choice(move_numbers)
+
+    print("Move selected: {0}".format(valid_positions[move_numbers.index(move_choice)]))
+    return move_choice
+
+# End Move
+
+# Select move with most possible flips (choose randomly if multiple) (dumbAI-2)
+# Parameters:
+#   valid_dictionary = dictionary;
+#   valid_positions = list;
+# Returns:
+#   move_choice = element from valid_positions;
+def MaxMove(valid_dictionary, valid_positions):
+    move_numbers = [x for x in valid_dictionary.keys()]
     
     # Select move with most possible flips (choose randomly if multiple)
-    # move_choices = [] # list of reduced move choices
-    # max_length = 0 # Start low to increase later
-    # for move in valid_dictionary.keys():
-    #     current_length = len(valid_dictionary[move])
-    #     if (current_length > max_length):
-    #         max_length = len(valid_dictionary[move])
-    #         move_choices = [] # reset move_choices
-    #         move_choices.append(move) # reset move choices
-    #     elif (current_length < max_length):
-    #         continue # skip this move
-    #     else: # move has same legnth as previous maximum
-    #         move_choices.append(move) # add extra move to list
-    #         # max_length remains unchanged
-    #     # End if
-    # # End for
-    # move_choice = random.choice(move_choices)
+    move_choices = [] # list of reduced move choices
+    max_length = 0 # Start low to increase later
+    for move in valid_dictionary.keys():
+        current_length = len(valid_dictionary[move])
+        if (current_length > max_length):
+            max_length = len(valid_dictionary[move])
+            move_choices = [] # reset move_choices
+            move_choices.append(move) # reset move choices
+        elif (current_length < max_length):
+            continue # skip this move
+        else: # move has same legnth as previous maximum
+            move_choices.append(move) # add extra move to list
+            # max_length remains unchanged
+        # End if
+    # End for
+    move_choice = random.choice(move_choices)
+
+    print("Move selected: {0}".format(valid_positions[move_numbers.index(move_choice)]))
+    return move_choice
+
+# End Move
+
+# Select move with least possible flips (choose randomly if multiple) (dumbAI-3)
+# Parameters:
+#   valid_dictionary = dictionary;
+#   valid_positions = list;
+# Returns:
+#   move_choice = element from valid_positions;
+def MinMove(valid_dictionary, valid_positions):
+    move_numbers = [x for x in valid_dictionary.keys()]
 
     # Select move with least possible flips (choose randomly if multiple)
-    # move_choices = [] # list of reduced move choices
-    # min_length = 30 # Start high to decrease later
-    # for move in valid_dictionary.keys():
-    #     current_length = len(valid_dictionary[move])
-    #     if (current_length < min_length):
-    #         min_length = len(valid_dictionary[move])
-    #         move_choices = [] # reset move_choices
-    #         move_choices.append(move) # reset move choices
-    #     elif (current_length > min_length):
-    #         continue # skip this move
-    #     else: # move has same legnth as previous maximum
-    #         move_choices.append(move) # add extra move to list
-    #         # max_length remains unchanged
-    #     # End if
-    # # End for
-    # move_choice = random.choice(move_choices)
+    move_choices = [] # list of reduced move choices
+    min_length = 30 # Start high to decrease later
+    for move in valid_dictionary.keys():
+        current_length = len(valid_dictionary[move])
+        if (current_length < min_length):
+            min_length = len(valid_dictionary[move])
+            move_choices = [] # reset move_choices
+            move_choices.append(move) # reset move choices
+        elif (current_length > min_length):
+            continue # skip this move
+        else: # move has same legnth as previous maximum
+            move_choices.append(move) # add extra move to list
+            # max_length remains unchanged
+        # End if
+    # End for
+    move_choice = random.choice(move_choices)
 
     print("Move selected: {0}".format(valid_positions[move_numbers.index(move_choice)]))
     return move_choice
