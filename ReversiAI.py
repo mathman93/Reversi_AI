@@ -8,11 +8,12 @@
 # 3. Determine way to look ahead at state of board based on move choice
 
 from ReversiClasses import GameBoard
-import random
+from ReversiClasses import Player
 
 # Main function for playing game
 def main():
     board = GameBoard() # Create game board for Reversi
+    cpu = Player()
     print("Starting Position:")
     board.PrintBoard()
 
@@ -29,7 +30,7 @@ def main():
             print("No valid moves: Pass")
             bp = True
         else: # Have person pick a move
-            move_choice = MaxMove(valid_dictionary, valid_positions)
+            move_choice = cpu.Move(valid_dictionary, valid_positions)
             # Update pieces based on move_choice
             board.Update(player, move_choice, valid_dictionary)
         # End if
@@ -53,7 +54,7 @@ def main():
             print("No valid moves: Pass")
             wp = True
         else: # Have person pick a move
-            move_choice = MinMove(valid_dictionary, valid_positions)
+            move_choice = cpu.Randal(valid_dictionary, valid_positions)
             # Update pieces based on move_choice
             board.Update(player, move_choice, valid_dictionary)
         # End if
@@ -72,114 +73,6 @@ def main():
     # Declare winner
     board.DeclareWinner()
 # End main
-
-# Have player choose a move and update the state of the board
-# Parameters:
-#   valid_dictionary = dictionary;
-#   valid_positions = list;
-# Returns:
-#   move_choice = element from valid_positions;
-def Move(valid_dictionary, valid_positions):
-    move_numbers = [x for x in valid_dictionary.keys()]
-    # Have player choose a move
-    while True:
-        move_choice = input("Select a Move: ").upper()
-        if move_choice in valid_positions:
-            break # Continue with chosen move
-        else: # Not a valid move
-            print("Not a valid move. Please try again.")
-            message_string = "Valid positions are"
-            for v in valid_positions:
-                message_string += " "
-                message_string += v
-                message_string += ";"
-            # End for v
-            print(message_string)
-        # End if
-    # End while
-    move_index = valid_positions.index(move_choice)
-    return move_numbers[move_index]
-# End Move
-
-# Select a random move and update the state of the board (dumbAI)
-# Parameters:
-#   valid_dictionary = dictionary;
-#   valid_positions = list;
-# Returns:
-#   move_choice = element from valid_positions;
-def RandomMove(valid_dictionary, valid_positions):
-    move_numbers = [x for x in valid_dictionary.keys()]
-    # Select random move from valid_positions
-    move_choice = random.choice(move_numbers)
-
-    print("Move selected: {0}".format(valid_positions[move_numbers.index(move_choice)]))
-    return move_choice
-
-# End Move
-
-# Select move with most possible flips (choose randomly if multiple) (dumbAI-2)
-# Parameters:
-#   valid_dictionary = dictionary;
-#   valid_positions = list;
-# Returns:
-#   move_choice = element from valid_positions;
-def MaxMove(valid_dictionary, valid_positions):
-    move_numbers = [x for x in valid_dictionary.keys()]
-    
-    # Select move with most possible flips (choose randomly if multiple)
-    move_choices = [] # list of reduced move choices
-    max_length = 0 # Start low to increase later
-    for move in valid_dictionary.keys():
-        current_length = len(valid_dictionary[move])
-        if (current_length > max_length):
-            max_length = len(valid_dictionary[move])
-            move_choices = [] # reset move_choices
-            move_choices.append(move) # reset move choices
-        elif (current_length < max_length):
-            continue # skip this move
-        else: # move has same legnth as previous maximum
-            move_choices.append(move) # add extra move to list
-            # max_length remains unchanged
-        # End if
-    # End for
-    move_choice = random.choice(move_choices)
-
-    print("Move selected: {0}".format(valid_positions[move_numbers.index(move_choice)]))
-    return move_choice
-
-# End Move
-
-# Select move with least possible flips (choose randomly if multiple) (dumbAI-3)
-# Parameters:
-#   valid_dictionary = dictionary;
-#   valid_positions = list;
-# Returns:
-#   move_choice = element from valid_positions;
-def MinMove(valid_dictionary, valid_positions):
-    move_numbers = [x for x in valid_dictionary.keys()]
-
-    # Select move with least possible flips (choose randomly if multiple)
-    move_choices = [] # list of reduced move choices
-    min_length = 30 # Start high to decrease later
-    for move in valid_dictionary.keys():
-        current_length = len(valid_dictionary[move])
-        if (current_length < min_length):
-            min_length = len(valid_dictionary[move])
-            move_choices = [] # reset move_choices
-            move_choices.append(move) # reset move choices
-        elif (current_length > min_length):
-            continue # skip this move
-        else: # move has same legnth as previous maximum
-            move_choices.append(move) # add extra move to list
-            # max_length remains unchanged
-        # End if
-    # End for
-    move_choice = random.choice(move_choices)
-
-    print("Move selected: {0}".format(valid_positions[move_numbers.index(move_choice)]))
-    return move_choice
-
-# End Move
 
 ## Main Code
 main()

@@ -3,6 +3,8 @@
 # Author: Timothy Anglea
 # Last Modified: 7/26/23
 
+import random
+
 class GameBoard:
     # Create game board variables and state
     def __init__(self):
@@ -197,4 +199,116 @@ class GameBoard:
         white_count = self.white.bit_count()
         return [black_count, white_count]
     # End CountStones
-# End class Board
+# End class GameBoard
+
+# Player/AI class that chooses a (valid) move to make on their turn
+class Player(GameBoard): # Does not need to be a child of GameBoard (yet)
+    def __init__(self):
+        pass
+    # End __init__
+
+    # Have player choose a (valid) move
+    # Parameters:
+    #   valid_dictionary = dictionary;
+    #   valid_positions = list;
+    # Returns:
+    #   move_choice = element from valid_positions;
+    def Move(self, valid_dictionary, valid_positions):
+        move_numbers = [x for x in valid_dictionary.keys()]
+        # Have player choose a move
+        while True:
+            move_choice = input("Select a Move: ").upper()
+            if move_choice in valid_positions:
+                break # Continue with chosen move
+            else: # Not a valid move
+                print("Not a valid move. Please try again.")
+                message_string = "Valid positions are"
+                for v in valid_positions:
+                    message_string += " "
+                    message_string += v
+                    message_string += ";"
+                # End for v
+                print(message_string)
+            # End if
+        # End while
+        move_index = valid_positions.index(move_choice)
+        return move_numbers[move_index]
+    # End Move
+
+    # Select a random (valid) move
+    # Parameters:
+    #   valid_dictionary = dictionary;
+    #   valid_positions = list;
+    # Returns:
+    #   move_choice = element from valid_positions;
+    def Randal(self, valid_dictionary, valid_positions):
+        move_numbers = [x for x in valid_dictionary.keys()]
+        # Select random move from valid_positions
+        move_choice = random.choice(move_numbers)
+
+        print("Move selected: {0}".format(valid_positions[move_numbers.index(move_choice)]))
+        return move_choice
+    # End Randal
+
+    # Select move with most possible flips (choose randomly if multiple) (dumbAI-2)
+    # Parameters:
+    #   valid_dictionary = dictionary;
+    #   valid_positions = list;
+    # Returns:
+    #   move_choice = element from valid_positions;
+    def Maxine(self, valid_dictionary, valid_positions):
+        move_numbers = [x for x in valid_dictionary.keys()]
+        
+        # Select move with most possible flips (choose randomly if multiple)
+        move_choices = [] # list of reduced move choices
+        max_length = 0 # Start low to increase later
+        for move in valid_dictionary.keys():
+            current_length = len(valid_dictionary[move])
+            if (current_length > max_length):
+                max_length = len(valid_dictionary[move])
+                move_choices = [] # reset move_choices
+                move_choices.append(move) # reset move choices
+            elif (current_length < max_length):
+                continue # skip this move
+            else: # move has same legnth as previous maximum
+                move_choices.append(move) # add extra move to list
+                # max_length remains unchanged
+            # End if
+        # End for
+        move_choice = random.choice(move_choices)
+
+        print("Move selected: {0}".format(valid_positions[move_numbers.index(move_choice)]))
+        return move_choice
+    # End Maxine
+
+    # Select move with least possible flips (choose randomly if multiple) (dumbAI-3)
+    # Parameters:
+    #   valid_dictionary = dictionary;
+    #   valid_positions = list;
+    # Returns:
+    #   move_choice = element from valid_positions;
+    def Minnie(self, valid_dictionary, valid_positions):
+        move_numbers = [x for x in valid_dictionary.keys()]
+
+        # Select move with least possible flips (choose randomly if multiple)
+        move_choices = [] # list of reduced move choices
+        min_length = 30 # Start high to decrease later
+        for move in valid_dictionary.keys():
+            current_length = len(valid_dictionary[move])
+            if (current_length < min_length):
+                min_length = len(valid_dictionary[move])
+                move_choices = [] # reset move_choices
+                move_choices.append(move) # reset move choices
+            elif (current_length > min_length):
+                continue # skip this move
+            else: # move has same legnth as previous maximum
+                move_choices.append(move) # add extra move to list
+                # max_length remains unchanged
+            # End if
+        # End for
+        move_choice = random.choice(move_choices)
+
+        print("Move selected: {0}".format(valid_positions[move_numbers.index(move_choice)]))
+        return move_choice
+    # End Minnie
+# End class CPU
