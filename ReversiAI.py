@@ -1,6 +1,6 @@
 # ReversiAI.py
-# Purpose: To play Reversi optimally
-# Last Updated: 7/26/2023
+# Purpose: To play Reversi (Othello) and develop AI to choose moves optimally
+# Last Updated: 7/31/2023
 # Author: Timothy Anglea
 # List of things to update:
 # 1. Should valid_dictionary just be a class variable for Board?

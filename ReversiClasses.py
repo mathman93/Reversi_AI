@@ -1,7 +1,7 @@
 # ReversiClasses.py
 # Purpose: File for holding python classes related to ReversiAI.py
 # Author: Timothy Anglea
-# Last Modified: 7/26/23
+# Last Modified: 7/31/23
 
 import random
 
@@ -250,7 +250,7 @@ class Player(GameBoard): # Does not need to be a child of GameBoard (yet)
         return move_choice
     # End Randal
 
-    # Select move with most possible flips (choose randomly if multiple) (dumbAI-2)
+    # Select move with most possible flips (choose randomly if multiple)
     # Parameters:
     #   valid_dictionary = dictionary;
     #   valid_positions = list;
@@ -281,7 +281,7 @@ class Player(GameBoard): # Does not need to be a child of GameBoard (yet)
         return move_choice
     # End Maxine
 
-    # Select move with least possible flips (choose randomly if multiple) (dumbAI-3)
+    # Select move with least possible flips (choose randomly if multiple)
     # Parameters:
     #   valid_dictionary = dictionary;
     #   valid_positions = list;
