@@ -11,9 +11,11 @@ from ReversiClasses import GameBoard
 from ReversiClasses import Player
 
 # Main function for playing game
-def main():
+def main(cpu_opponent_name):
     board = GameBoard() # Create game board for Reversi
     cpu = Player()
+    cpu_opponent = getattr(cpu, cpu_opponent_name)
+
     print("Starting Position:")
     board.PrintBoard()
 
@@ -54,7 +56,7 @@ def main():
             print("No valid moves: Pass")
             wp = True
         else: # Have person pick a move
-            move_choice = cpu.Randal(valid_dictionary, valid_positions)
+            move_choice = cpu_opponent(valid_dictionary, valid_positions)
             # Update pieces based on move_choice
             board.Update(player, move_choice, valid_dictionary)
         # End if
@@ -75,5 +77,10 @@ def main():
 # End main
 
 ## Main Code
-main()
+# List of methods in class Player (to allow for choice of CPU opponent)
+method_list = [attribute for attribute in dir(Player) if callable(getattr(Player, attribute)) and attribute.startswith('__') is False]
+playable_opponents = [cpu for cpu in method_list if (cpu == "Move") is False]
+print(playable_opponents)
+
+main("Minnie")
 print("End")

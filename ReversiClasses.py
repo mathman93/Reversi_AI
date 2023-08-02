@@ -7,7 +7,7 @@ import random
 
 class GameBoard:
     # Create game board variables and state
-    def __init__(self):
+    def __init__(self, b = None, w = None):
         self.__board_size = 8 # Size of board (size x size)
         self.board_positions = [] # possible board selections
         self.__row_names = ["A", "B", "C", "D", "E", "F", "G", "H"]
@@ -20,7 +20,7 @@ class GameBoard:
         self.black = 0x0
         self.white = 0x0
         # Initialize state of board
-        self.InitializeBoard()
+        self.InitializeBoard(b, w)
 
     # End __init__
 
@@ -202,7 +202,7 @@ class GameBoard:
 # End class GameBoard
 
 # Player/AI class that chooses a (valid) move to make on their turn
-class Player(GameBoard): # Does not need to be a child of GameBoard (yet)
+class Player(): # Does not need to be a child of GameBoard (I think)
     def __init__(self):
         pass
     # End __init__
