@@ -246,7 +246,7 @@ class Player(): # Does not need to be a child of GameBoard (I think)
         # Select random move from valid_positions
         move_choice = random.choice(move_numbers)
 
-        print("Move selected: {0}".format(valid_positions[move_numbers.index(move_choice)]))
+        #print("Move selected: {0}".format(valid_positions[move_numbers.index(move_choice)]))
         return move_choice
     # End Randal
 
@@ -277,7 +277,7 @@ class Player(): # Does not need to be a child of GameBoard (I think)
         # End for
         move_choice = random.choice(move_choices)
 
-        print("Move selected: {0}".format(valid_positions[move_numbers.index(move_choice)]))
+        #print("Move selected: {0}".format(valid_positions[move_numbers.index(move_choice)]))
         return move_choice
     # End Maxine
 
@@ -308,7 +308,7 @@ class Player(): # Does not need to be a child of GameBoard (I think)
         # End for
         move_choice = random.choice(move_choices)
 
-        print("Move selected: {0}".format(valid_positions[move_numbers.index(move_choice)]))
+        #print("Move selected: {0}".format(valid_positions[move_numbers.index(move_choice)]))
         return move_choice
     # End Minnie
 # End class CPU
