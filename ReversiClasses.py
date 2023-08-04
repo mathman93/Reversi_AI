@@ -207,13 +207,13 @@ class Player(): # Does not need to be a child of GameBoard (I think)
         pass
     # End __init__
 
-    # Have player choose a (valid) move
+    # Have human player choose a (valid) move
     # Parameters:
     #   valid_dictionary = dictionary;
     #   valid_positions = list;
     # Returns:
     #   move_choice = element from valid_positions;
-    def Move(self, valid_dictionary, valid_positions):
+    def Human(self, valid_dictionary, valid_positions, black, white):
         move_numbers = [x for x in valid_dictionary.keys()]
         # Have player choose a move
         while True:
@@ -233,7 +233,7 @@ class Player(): # Does not need to be a child of GameBoard (I think)
         # End while
         move_index = valid_positions.index(move_choice)
         return move_numbers[move_index]
-    # End Move
+    # End Human
 
     # Select a random (valid) move
     # Parameters:
@@ -241,7 +241,7 @@ class Player(): # Does not need to be a child of GameBoard (I think)
     #   valid_positions = list;
     # Returns:
     #   move_choice = element from valid_positions;
-    def Randal(self, valid_dictionary, valid_positions):
+    def Randal(self, valid_dictionary, valid_positions, black, white):
         move_numbers = [x for x in valid_dictionary.keys()]
         # Select random move from valid_positions
         move_choice = random.choice(move_numbers)
@@ -256,7 +256,7 @@ class Player(): # Does not need to be a child of GameBoard (I think)
     #   valid_positions = list;
     # Returns:
     #   move_choice = element from valid_positions;
-    def Maxine(self, valid_dictionary, valid_positions):
+    def Maxine(self, valid_dictionary, valid_positions, black, white):
         move_numbers = [x for x in valid_dictionary.keys()]
         
         # Select move with most possible flips (choose randomly if multiple)
@@ -287,7 +287,7 @@ class Player(): # Does not need to be a child of GameBoard (I think)
     #   valid_positions = list;
     # Returns:
     #   move_choice = element from valid_positions;
-    def Minnie(self, valid_dictionary, valid_positions):
+    def Minnie(self, valid_dictionary, valid_positions, black, white):
         move_numbers = [x for x in valid_dictionary.keys()]
 
         # Select move with least possible flips (choose randomly if multiple)
