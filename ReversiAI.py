@@ -1,15 +1,16 @@
 # ReversiAI.py
 # Purpose: To play Reversi (Othello) and develop AI to choose moves optimally
-# Last Updated: 7/31/2023
+# Last Updated: 8/4/2023
 # Author: Timothy Anglea
 # List of things to update:
 # 1. Should valid_dictionary just be a class variable for Board?
-# 2. Create way to choose type of play (vs. CPU; CPUvCPU; etc.)
+# 2. Improve interface for GenerateStatistics
 # 3. Determine way to look ahead at state of board based on move choice
 
 from ReversiClasses import GameBoard
 from ReversiClasses import Player
 import random
+import time
 
 # Main function for playing game
 def PlayGame(player1_name, player2_name, display_output = True):
@@ -112,20 +113,95 @@ def GenerateStatistics():
     method_list = [attribute for attribute in dir(Player) if callable(getattr(Player, attribute)) and attribute.startswith('__') is False]
     playable_opponents = [cpu for cpu in method_list if (cpu == "Human") is False]
     #print(playable_opponents) # Include for testing
-
-    opponent_name = GetOpponent(playable_opponents)
-    if (opponent_name == None): # May need to adjust this later
+    print("Select player 1 CPU:")
+    player1 = GetOpponent(playable_opponents)
+    if (player1 == None): # May need to adjust this later
         return # User exitted opponent selection
     # End if
-    for game_number in range(100):
+    print("Select player 2 CPU:")
+    player2 = GetOpponent(playable_opponents)
+    if (player2 == None): # May need to adjust this later
+        return # User exitted opponent selection
+    # End if
+
+    N = 10000
+    print("Playing {0} games, {1} vs. {2}...".format(N, player1, player2))
+    game_score_list = [] # list of tuples of stone states between player 1 and player 2
+    start = time.time()
+    for game_number in range(N):
+        if (game_number > 0 and game_number % (N/10) < 1):
+            time_elapsed = time.time() - start
+            total_expected_time = time_elapsed * (N/game_number)
+            remaining_time = total_expected_time - time_elapsed
+            print("{0:.2f}% complete... (~{1:.2f} seconds remaining)".format(game_number*100/N, remaining_time))
         # Alternate who starts first in each game
         if (game_number % 2 == 0):
-            [black, white] = PlayGame("Randal", "Maxine", False)
+            [black, white] = PlayGame(player1, player2, False)
+            game_score_list.append((black,white)) # (player1 stones, player2 stones)
         else:
-            [black, white] = PlayGame("Maxine", "Randal", False)
+            [black, white] = PlayGame(player2, player1, False)
+            game_score_list.append((white,black)) # (player1 stones, player2 stones)
         # End if
     # End for
+    print("Time to play {0} games: {1:.2f} seconds".format(N, time.time()-start))
+    print("Generating Statistics...")
+    player1_wins = 0
+    player2_wins = 0
+    player_ties = 0
+    short_games = 0
+    player1_td = 0
+    player2_td = 0
+    for score in game_score_list:
+        (p1, p2) = score
+        winner = ReturnWinner(p1, p2)
+        if (winner == 1):
+            player1_wins += 1
+        elif (winner == 2):
+            player2_wins += 1
+        else: # winner = 0
+            player_ties += 1
+        # End if winner
+        if (p1 | p2 < 0xffffffffffffffff): # Game board was not filled
+            short_games += 1
+            # print("Incomplete Board") # Include for debugging
+            # board = GameBoard(p1,p2)
+            # board.PrintBoard()
+        # End if
+        if (p2 == 0): # Player2 lost all pieces
+            player1_td += 1
+            # print("Player 1 Dominates") # Include for debugging
+            # board = GameBoard(p1,p2)
+            # board.PrintBoard()
+        elif (p1 == 0): # Player1 lost all pieces
+            player2_td += 1
+            # print("Player 2 Dominates") # Include for debugging
+            # board = GameBoard(p1,p2)
+            # board.PrintBoard()
+        # End if
+    # End for
+    total_domination = player1_td + player2_td
+    print("Player 1 Wins % - {0:.2f}%".format(player1_wins*100/N))
+    print("Player 2 Wins % - {0:.2f}%".format(player2_wins*100/N))
+    print("Total Ties % - {0:.2f}%".format(player_ties*100/N))
+    print("% of games with incomplete board - {0:.2f}%".format(short_games*100/N))
+    print("% of games with only one stone color - {0:.2f}%".format((total_domination)*100/N))
+    if (total_domination > 0):
+        print("Domination Ratio: P1:{0:.2f}% - P2:{1:.2f}%".format(player1_td*100/total_domination, player2_td*100/total_domination))
 # End GenerateStatistics
+
+# Returns the winner of the game based on the total number of stones for each player
+def ReturnWinner(b, w):
+    black_total = b.bit_count()
+    white_total = w.bit_count()
+    #print("Black: {0} - White: {1}".format(black_total, white_total))
+    if (black_total == white_total):
+        return 0 # Tie
+    elif (black_total > white_total):
+        return 1 # Black wins
+    else:
+        return 2 # White wins
+    # End if
+# End ReturnWinner
 
 ## Main Code
 print("Welcome to Reversi! How would you like to play?")

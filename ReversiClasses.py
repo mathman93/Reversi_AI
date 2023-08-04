@@ -1,10 +1,11 @@
 # ReversiClasses.py
 # Purpose: File for holding python classes related to ReversiAI.py
 # Author: Timothy Anglea
-# Last Modified: 7/31/23
+# Last Modified: 8/4/23
 
 import random
 
+# All functions/methods related to operating the game board
 class GameBoard:
     # Create game board variables and state
     def __init__(self, b = None, w = None):
@@ -245,6 +246,21 @@ class Player(): # Does not need to be a child of GameBoard (I think)
         move_numbers = [x for x in valid_dictionary.keys()]
         # Select random move from valid_positions
         move_choice = random.choice(move_numbers)
+
+        #print("Move selected: {0}".format(valid_positions[move_numbers.index(move_choice)]))
+        return move_choice
+    # End Randal
+
+    # Select the first (valid) move (position with smallest board number)
+    # Parameters:
+    #   valid_dictionary = dictionary;
+    #   valid_positions = list;
+    # Returns:
+    #   move_choice = element from valid_positions;
+    def Tina(self, valid_dictionary, valid_positions, black, white):
+        move_numbers = [x for x in valid_dictionary.keys()]
+        # Select first move from valid_positions
+        move_choice = move_numbers[0]
 
         #print("Move selected: {0}".format(valid_positions[move_numbers.index(move_choice)]))
         return move_choice
