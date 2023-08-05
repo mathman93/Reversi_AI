@@ -12,7 +12,52 @@ from ReversiClasses import Player
 import random
 import time
 
-# Main function for playing game
+# Top-level function for controlling game settings
+def main():
+    print("Welcome to Reversi! How would you like to play?")
+    print("Mode 1: Two-player game")
+    print("Mode 2: Play against CPU")
+    print("Mode 3: Generate CPU vs. CPU stats")
+    while True:
+        try:
+            mode_select = int(input("Select mode (1-3): "))
+            if (mode_select == 1):
+                [_, _] = PlayGame("Human", "Human") # Both players are humans
+                break
+            elif (mode_select == 2):
+                # List of methods in class Player (to allow for choice of CPU opponent)
+                method_list = [attribute for attribute in dir(Player) if callable(getattr(Player, attribute)) and attribute.startswith('__') is False]
+                playable_opponents = [cpu for cpu in method_list if (cpu == "Human") is False]
+                #print(playable_opponents) # Include for testing
+
+                opponent_name = GetOpponent(playable_opponents)
+                if (opponent_name == None):
+                    break # User exitted opponent selection
+                # End if
+                first = random.randint(1,2)
+                if (first == 1): # Player 1 (human) is black and goes first
+                    print("You are black (X) and will go first.")
+                    [_, _] = PlayGame("Human", opponent_name)
+                else: # Player 2 (CPU or human) is black and goes first
+                    print("You are white (O) and will go second.")
+                    [_, _] = PlayGame(opponent_name, "Human")
+                # End if first
+                break
+            elif (mode_select == 3):
+                pass # Not implemented yet
+                GenerateStatistics()
+                break
+            else:
+                print("That's not a valid game mode.")
+                continue
+        except KeyboardInterrupt:
+            print("")
+            break
+        # End try
+    # End while
+# End main
+
+# Primary function for playing game
 def PlayGame(player1_name, player2_name, display_output = True):
     board = GameBoard() # Create game board for Reversi
     cpu = Player()
@@ -40,6 +85,7 @@ def PlayGame(player1_name, player2_name, display_output = True):
             board.Update(player, move_choice, valid_dictionary)
         # End if
         if display_output: board.PrintBoard()
+        if bp & display_output: time.sleep(0.3)
 
         # End conditions
         if (bp & wp): # If both players recently passed
@@ -58,13 +104,14 @@ def PlayGame(player1_name, player2_name, display_output = True):
             if display_output: print("No valid moves: Pass")
             wp = True
         else: # Have White pick a move
-            move_choice = Player2(valid_dictionary, valid_positions, board.black, board.white)
+            move_choice = Player2(valid_dictionary, valid_positions, board.white, board.black)
             if display_output: print("Move selected: {0}".format(board.board_positions[move_choice]))
         
             # Update pieces based on move_choice
             board.Update(player, move_choice, valid_dictionary)
         # End if
         if display_output: board.PrintBoard()
+        if wp & display_output: time.sleep(0.3)
 
         # End conditions
         if (bp & wp): # If both players recently passed
@@ -124,7 +171,7 @@ def GenerateStatistics():
         return # User exitted opponent selection
     # End if
 
-    N = 10000
+    N = 5000
     print("Playing {0} games, {1} vs. {2}...".format(N, player1, player2))
     game_score_list = [] # list of tuples of stone states between player 1 and player 2
     start = time.time()
@@ -207,46 +254,5 @@ def ReturnWinner(b, w):
 # End ReturnWinner
 
 ## Main Code
-print("Welcome to Reversi! How would you like to play?")
-print("Mode 1: Two-player game")
-print("Mode 2: Play against CPU")
-print("Mode 3: Generate CPU vs. CPU stats")
-while True:
-    try:
-        mode_select = int(input("Select mode (1-3): "))
-        if (mode_select == 1):
-            [_, _] = PlayGame("Human", "Human") # Both players are humans
-            break
-        elif (mode_select == 2):
-            # List of methods in class Player (to allow for choice of CPU opponent)
-            method_list = [attribute for attribute in dir(Player) if callable(getattr(Player, attribute)) and attribute.startswith('__') is False]
-            playable_opponents = [cpu for cpu in method_list if (cpu == "Human") is False]
-            #print(playable_opponents) # Include for testing
-
-            opponent_name = GetOpponent(playable_opponents)
-            if (opponent_name == None):
-                break # User exitted opponent selection
-            # End if
-            first = random.randint(1,2)
-            if (first == 1): # Player 1 (human) is black and goes first
-                print("You are black (X) and will go first.")
-                [_, _] = PlayGame("Human", opponent_name)
-            else: # Player 2 (CPU or human) is black and goes first
-                print("You are white (O) and will go second.")
-                [_, _] = PlayGame(opponent_name, "Human")
-            # End if first
-            break
-        elif (mode_select == 3):
-            pass # Not implemented yet
-            GenerateStatistics()
-            break
-        else:
-            print("That's not a valid game mode.")
-            continue
-    except KeyboardInterrupt:
-        print("")
-        break
-    # End try
-# End while
-
+main()
 print("End")

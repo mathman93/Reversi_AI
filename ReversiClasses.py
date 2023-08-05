@@ -335,7 +335,7 @@ class Player(): # Does not need to be a child of GameBoard (I think)
     # Returns:
     #   move_choice = element from valid_positions;
     def Priya(self, valid_dictionary, valid_positions, black, white):
-        [a,b,c,d,e,f,g,h,i] = [10,2,7,8,1,3,4,6,5]
+        [a,b,c,d,e,f,g,h,i] = [9,2,7,8,1,3,4,6,5]
         board_weights = [a, b, c, d, d, c, b, a,
                          b, e, f, g, g, f, e, b,
                          c, f, h, i, i, h, f, c,
@@ -387,10 +387,12 @@ class Player(): # Does not need to be a child of GameBoard (I think)
     # Parameters:
     #   valid_dictionary = dictionary;
     #   valid_positions = list;
+    #   stones_p = int; bit map of player's stones on the board
+    #   stones_o = int; bit map of opponent's stones on the board
     # Returns:
     #   move_choice = element from valid_positions;
-    def Priya2(self, valid_dictionary, valid_positions, black, white):
-        [a,b,c,d,e,f,g,h,i] = [20,3,13,11,0,6,6,9,7]
+    def Priya2(self, valid_dictionary, valid_positions, stones_p, stones_o):
+        [a,b,c,d,e,f,g,h,i] = [25,2,14,13,0,6,7,11,10]
         board_weights = [a, b, c, d, d, c, b, a,
                          b, e, f, g, g, f, e, b,
                          c, f, h, i, i, h, f, c,
@@ -399,14 +401,28 @@ class Player(): # Does not need to be a child of GameBoard (I think)
                          c, f, h, i, i, h, f, c,
                          b, e, f, g, g, f, e, b,
                          a, b, c, d, d, c, b, a]
-        ratio = -0.5
+        ratio = 0.5
+        ratio2 = 0.08
         move_numbers = [x for x in valid_dictionary.keys()]
 
         # Find highest ranked moves (based on position and number of flipped stones)
         #move_choices = [] # list of reduced move choices
         max_weight = None # Start low to increase later
         for move in valid_dictionary.keys():
-            current_weight = board_weights[move] + (ratio * len(valid_dictionary[move]))
+            near_stones = 0
+            for offset in [-9,-8,-7,-1,1,7,8,9]:
+                shift = move + offset
+                if (shift < 64 and shift >= 0):
+                    if (((1 << shift) & stones_p) > 0):
+                        near_stones += board_weights[shift]
+                    elif (((1 << shift) & stones_o) > 0):
+                        near_stones -= board_weights[shift]
+                    # End if
+                else:
+                    continue # Not a valid board position
+                # End if
+            # End for
+            current_weight = board_weights[move] - (ratio * len(valid_dictionary[move])) + (ratio2 * near_stones)
             if (max_weight == None or current_weight > max_weight):
                 max_weight = current_weight
                 move_choices = []
