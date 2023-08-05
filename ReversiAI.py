@@ -133,7 +133,10 @@ def GenerateStatistics():
             time_elapsed = time.time() - start
             total_expected_time = time_elapsed * (N/game_number)
             remaining_time = total_expected_time - time_elapsed
-            print("{0:.2f}% complete... (~{1:.2f} seconds remaining)".format(game_number*100/N, remaining_time))
+            print("{0:.1f}% complete... (~{1:.2f} seconds remaining)".format(game_number*100/N, remaining_time))
+        # End if
+        # [black, white] = PlayGame(player1, player2, False)
+        # game_score_list.append((black,white)) # (player1 stones, player2 stones)
         # Alternate who starts first in each game
         if (game_number % 2 == 0):
             [black, white] = PlayGame(player1, player2, False)

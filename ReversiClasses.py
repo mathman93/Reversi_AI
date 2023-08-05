@@ -264,7 +264,7 @@ class Player(): # Does not need to be a child of GameBoard (I think)
 
         #print("Move selected: {0}".format(valid_positions[move_numbers.index(move_choice)]))
         return move_choice
-    # End Randal
+    # End Tina
 
     # Select move with most possible flips (choose randomly if multiple)
     # Parameters:
@@ -327,4 +327,99 @@ class Player(): # Does not need to be a child of GameBoard (I think)
         #print("Move selected: {0}".format(valid_positions[move_numbers.index(move_choice)]))
         return move_choice
     # End Minnie
+
+    # Select move based on pre-defined position importance
+    # Parameters:
+    #   valid_dictionary = dictionary;
+    #   valid_positions = list;
+    # Returns:
+    #   move_choice = element from valid_positions;
+    def Priya(self, valid_dictionary, valid_positions, black, white):
+        [a,b,c,d,e,f,g,h,i] = [10,2,7,8,1,3,4,6,5]
+        board_weights = [a, b, c, d, d, c, b, a,
+                         b, e, f, g, g, f, e, b,
+                         c, f, h, i, i, h, f, c,
+                         d, g, i, 1, 1, i, g, d,
+                         d, g, i, 1, 1, i, g, d,
+                         c, f, h, i, i, h, f, c,
+                         b, e, f, g, g, f, e, b,
+                         a, b, c, d, d, c, b, a]
+        move_numbers = [x for x in valid_dictionary.keys()]
+
+        # Find highest ranked moves
+        move_choices2 = [] # list of reduced move choices
+        max_weight = 0 # Start low to increase later
+        for move in valid_dictionary.keys():
+            current_weight = board_weights[move]
+            if (current_weight > max_weight):
+                max_weight = current_weight
+                move_choices2 = []
+                move_choices2.append(move)
+            elif (current_weight < max_weight):
+                continue
+            else: # current_weight == max_weight)
+                move_choices2.append(move)
+            # End if
+        # End for
+        # Choose ranked move that flips the fewest opponent stones
+        move_choices = [] # list of reduced move choices
+        min_length = 30 # Start high to increase later
+        for move in move_choices2:
+            current_length = len(valid_dictionary[move])
+            if (current_length < min_length):
+                min_length = len(valid_dictionary[move])
+                move_choices = [] # reset move_choices
+                move_choices.append(move) # reset move choices
+            elif (current_length > min_length):
+                continue # skip this move
+            else: # move has same legnth as previous maximum
+                move_choices.append(move) # add extra move to list
+                # max_length remains unchanged
+            # End if
+        # End for
+
+        move_choice = random.choice(move_choices)
+        #print("Move selected: {0}".format(valid_positions[move_numbers.index(move_choice)]))
+        return move_choice
+    # End Priya
+
+    # Select move based on pre-defined position importance (experimental weights)
+    # Parameters:
+    #   valid_dictionary = dictionary;
+    #   valid_positions = list;
+    # Returns:
+    #   move_choice = element from valid_positions;
+    def Priya2(self, valid_dictionary, valid_positions, black, white):
+        [a,b,c,d,e,f,g,h,i] = [20,3,13,11,0,6,6,9,7]
+        board_weights = [a, b, c, d, d, c, b, a,
+                         b, e, f, g, g, f, e, b,
+                         c, f, h, i, i, h, f, c,
+                         d, g, i, 1, 1, i, g, d,
+                         d, g, i, 1, 1, i, g, d,
+                         c, f, h, i, i, h, f, c,
+                         b, e, f, g, g, f, e, b,
+                         a, b, c, d, d, c, b, a]
+        ratio = -0.5
+        move_numbers = [x for x in valid_dictionary.keys()]
+
+        # Find highest ranked moves (based on position and number of flipped stones)
+        #move_choices = [] # list of reduced move choices
+        max_weight = None # Start low to increase later
+        for move in valid_dictionary.keys():
+            current_weight = board_weights[move] + (ratio * len(valid_dictionary[move]))
+            if (max_weight == None or current_weight > max_weight):
+                max_weight = current_weight
+                move_choices = []
+                move_choices.append(move)
+            elif (current_weight < max_weight):
+                continue
+            else: # current_weight == max_weight)
+                move_choices.append(move)
+            # End if
+        # End for
+
+        move_choice = random.choice(move_choices)
+        #print("Move selected: {0}".format(valid_positions[move_numbers.index(move_choice)]))
+        return move_choice
+    # End Priya2
 # End class CPU
