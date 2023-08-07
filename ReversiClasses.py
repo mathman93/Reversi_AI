@@ -50,7 +50,6 @@ class GameBoard:
     #   player = int; player who is making the next (valid) move
     # Returns:
     #   valid_move_dict = dictionary; dictionary of stones that would be flipped for a given valid move
-    #   valid_moves_list = list; list of valid moves in the form of board position labels
     def ValidMoves(self, player):
         if (player == 1): # Black's turn to make a move
             p = self.black
@@ -109,9 +108,8 @@ class GameBoard:
                 # End if
             # End for
         # End for
-        # Construct list of valid moves based on the board position names
-        valid_moves_list = [self.board_positions[x] for x in valid_move_dict.keys()]
-        return [valid_move_dict, valid_moves_list]
+        
+        return valid_move_dict
     # End FindMoves
 
     # Update state of board based on chosen move by player (p)
@@ -211,20 +209,21 @@ class Player(): # Does not need to be a child of GameBoard (I think)
     # Have human player choose a (valid) move
     # Parameters:
     #   valid_dictionary = dictionary;
-    #   valid_positions = list;
     # Returns:
     #   move_choice = element from valid_positions;
-    def Human(self, valid_dictionary, valid_positions, black, white):
+    def Human(self, valid_dictionary, stones_p, stones_o):
         move_numbers = [x for x in valid_dictionary.keys()]
+        g = GameBoard() # Create a game board instance to get position names
+        valid_p = [g.board_positions[x] for x in valid_dictionary.keys()]
         # Have player choose a move
         while True:
             move_choice = input("Select a Move: ").upper()
-            if move_choice in valid_positions:
+            if move_choice in valid_p:
                 break # Continue with chosen move
             else: # Not a valid move
                 print("Not a valid move. Please try again.")
                 message_string = "Valid positions are"
-                for v in valid_positions:
+                for v in valid_p:
                     message_string += " "
                     message_string += v
                     message_string += ";"
@@ -232,48 +231,42 @@ class Player(): # Does not need to be a child of GameBoard (I think)
                 print(message_string)
             # End if
         # End while
-        move_index = valid_positions.index(move_choice)
+        move_index = valid_p.index(move_choice)
         return move_numbers[move_index]
     # End Human
 
     # Select a random (valid) move
     # Parameters:
     #   valid_dictionary = dictionary;
-    #   valid_positions = list;
     # Returns:
     #   move_choice = element from valid_positions;
-    def Randal(self, valid_dictionary, valid_positions, black, white):
+    def Randal(self, valid_dictionary, stones_p, stones_o):
         move_numbers = [x for x in valid_dictionary.keys()]
         # Select random move from valid_positions
         move_choice = random.choice(move_numbers)
 
-        #print("Move selected: {0}".format(valid_positions[move_numbers.index(move_choice)]))
         return move_choice
     # End Randal
 
     # Select the first (valid) move (position with smallest board number)
     # Parameters:
     #   valid_dictionary = dictionary;
-    #   valid_positions = list;
     # Returns:
     #   move_choice = element from valid_positions;
-    def Tina(self, valid_dictionary, valid_positions, black, white):
+    def Tina(self, valid_dictionary, stones_p, stones_o):
         move_numbers = [x for x in valid_dictionary.keys()]
         # Select first move from valid_positions
-        move_choice = move_numbers[0]
+        move_choice = min(move_numbers)
 
-        #print("Move selected: {0}".format(valid_positions[move_numbers.index(move_choice)]))
         return move_choice
     # End Tina
 
     # Select (valid) move position closest to top left corner
     # Parameters:
     #   valid_dictionary = dictionary;
-    #   valid_positions = list;
     # Returns:
     #   move_choice = element from valid_positions;
-    def Conner(self, valid_dictionary, valid_positions, black, white):
-        move_numbers = [x for x in valid_dictionary.keys()]
+    def Conner(self, valid_dictionary, stones_p, stones_o):
         # Select first move from valid_positions
         min_dist = None
         for move in valid_dictionary.keys():
@@ -294,19 +287,15 @@ class Player(): # Does not need to be a child of GameBoard (I think)
         # End for
         move_choice = random.choice(move_choices)
 
-        #print("Move selected: {0}".format(valid_positions[move_numbers.index(move_choice)]))
         return move_choice
-    # End Tina
+    # End Conner
 
     # Select move with most possible flips (choose randomly if multiple)
     # Parameters:
     #   valid_dictionary = dictionary;
-    #   valid_positions = list;
     # Returns:
     #   move_choice = element from valid_positions;
-    def Maxine(self, valid_dictionary, valid_positions, black, white):
-        move_numbers = [x for x in valid_dictionary.keys()]
-        
+    def Maxine(self, valid_dictionary, stones_p, stones_o):
         # Select move with most possible flips (choose randomly if multiple)
         move_choices = [] # list of reduced move choices
         max_length = 0 # Start low to increase later
@@ -325,19 +314,15 @@ class Player(): # Does not need to be a child of GameBoard (I think)
         # End for
         move_choice = random.choice(move_choices)
 
-        #print("Move selected: {0}".format(valid_positions[move_numbers.index(move_choice)]))
         return move_choice
     # End Maxine
 
     # Select move with least possible flips (choose randomly if multiple)
     # Parameters:
     #   valid_dictionary = dictionary;
-    #   valid_positions = list;
     # Returns:
     #   move_choice = element from valid_positions;
-    def Minnie(self, valid_dictionary, valid_positions, black, white):
-        move_numbers = [x for x in valid_dictionary.keys()]
-
+    def Minnie(self, valid_dictionary, stones_p, stones_o):
         # Select move with least possible flips (choose randomly if multiple)
         move_choices = [] # list of reduced move choices
         min_length = 30 # Start high to decrease later
@@ -356,17 +341,15 @@ class Player(): # Does not need to be a child of GameBoard (I think)
         # End for
         move_choice = random.choice(move_choices)
 
-        #print("Move selected: {0}".format(valid_positions[move_numbers.index(move_choice)]))
         return move_choice
     # End Minnie
 
     # Select move based on pre-defined position importance
     # Parameters:
     #   valid_dictionary = dictionary;
-    #   valid_positions = list;
     # Returns:
     #   move_choice = element from valid_positions;
-    def Priya(self, valid_dictionary, valid_positions, black, white):
+    def Priya(self, valid_dictionary, stones_p, stones_o):
         [a,b,c,d,e,f,g,h,i] = [9,2,7,8,1,3,4,6,5]
         board_weights = [a, b, c, d, d, c, b, a,
                          b, e, f, g, g, f, e, b,
@@ -376,7 +359,6 @@ class Player(): # Does not need to be a child of GameBoard (I think)
                          c, f, h, i, i, h, f, c,
                          b, e, f, g, g, f, e, b,
                          a, b, c, d, d, c, b, a]
-        move_numbers = [x for x in valid_dictionary.keys()]
 
         # Find highest ranked moves
         move_choices2 = [] # list of reduced move choices
@@ -411,19 +393,17 @@ class Player(): # Does not need to be a child of GameBoard (I think)
         # End for
 
         move_choice = random.choice(move_choices)
-        #print("Move selected: {0}".format(valid_positions[move_numbers.index(move_choice)]))
         return move_choice
     # End Priya
 
     # Select move based on pre-defined position importance (experimental weights)
     # Parameters:
     #   valid_dictionary = dictionary;
-    #   valid_positions = list;
     #   stones_p = int; bit map of player's stones on the board
     #   stones_o = int; bit map of opponent's stones on the board
     # Returns:
     #   move_choice = element from valid_positions;
-    def Priya2(self, valid_dictionary, valid_positions, stones_p, stones_o):
+    def Priya2(self, valid_dictionary, stones_p, stones_o):
         [a,b,c,d,e,f,g,h,i] = [25,2,14,13,0,6,7,11,10]
         board_weights = [a, b, c, d, d, c, b, a,
                          b, e, f, g, g, f, e, b,
@@ -435,7 +415,6 @@ class Player(): # Does not need to be a child of GameBoard (I think)
                          a, b, c, d, d, c, b, a]
         ratio = 0.5
         ratio2 = 0.08
-        move_numbers = [x for x in valid_dictionary.keys()]
 
         # Find highest ranked moves (based on position and number of flipped stones)
         #move_choices = [] # list of reduced move choices
@@ -467,7 +446,6 @@ class Player(): # Does not need to be a child of GameBoard (I think)
         # End for
 
         move_choice = random.choice(move_choices)
-        #print("Move selected: {0}".format(valid_positions[move_numbers.index(move_choice)]))
         return move_choice
     # End Priya2
 # End class CPU

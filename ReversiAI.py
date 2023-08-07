@@ -74,12 +74,12 @@ def PlayGame(player1_name, player2_name, display_output = True):
         player = 1 # Black's turn
         bp = False # Reset black pass flag
         if display_output: print("Black (X) to move...")
-        [valid_dictionary, valid_positions] = board.ValidMoves(player)
-        if (len(valid_positions) == 0): # No valid moves for player, and they must pass
+        valid_dictionary = board.ValidMoves(player)
+        if (len(valid_dictionary.keys()) == 0): # No valid moves for player, and they must pass
             if display_output: print("No valid moves: Pass")
             bp = True
         else: # Have Black pick a move
-            move_choice = Player1(valid_dictionary, valid_positions, board.black, board.white)
+            move_choice = Player1(valid_dictionary, board.black, board.white)
             if display_output: print("Move selected: {0}".format(board.board_positions[move_choice]))
             # Update pieces based on move_choice
             board.Update(player, move_choice, valid_dictionary)
@@ -99,12 +99,12 @@ def PlayGame(player1_name, player2_name, display_output = True):
         player = 2 # White's turn
         wp = False # Reset white pass flag
         if display_output: print("White (O) to move...")
-        [valid_dictionary, valid_positions] = board.ValidMoves(player)
-        if (len(valid_positions) == 0): # No valid moves for player, and they must pass
+        valid_dictionary = board.ValidMoves(player)
+        if (len(valid_dictionary.keys()) == 0): # No valid moves for player, and they must pass
             if display_output: print("No valid moves: Pass")
             wp = True
         else: # Have White pick a move
-            move_choice = Player2(valid_dictionary, valid_positions, board.white, board.black)
+            move_choice = Player2(valid_dictionary, board.white, board.black)
             if display_output: print("Move selected: {0}".format(board.board_positions[move_choice]))
         
             # Update pieces based on move_choice
