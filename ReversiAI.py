@@ -65,7 +65,7 @@ def PlayGame(player1_name, player2_name, display_output = True):
     Player2 = getattr(cpu, player2_name)
 
     if display_output: print("Starting Position:")
-    if display_output: board.PrintBoard() 
+    if display_output: board.PrintBoard()
 
     # Make moves until end of game
     bp = False

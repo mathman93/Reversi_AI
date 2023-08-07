@@ -266,6 +266,38 @@ class Player(): # Does not need to be a child of GameBoard (I think)
         return move_choice
     # End Tina
 
+    # Select (valid) move position closest to top left corner
+    # Parameters:
+    #   valid_dictionary = dictionary;
+    #   valid_positions = list;
+    # Returns:
+    #   move_choice = element from valid_positions;
+    def Conner(self, valid_dictionary, valid_positions, black, white):
+        move_numbers = [x for x in valid_dictionary.keys()]
+        # Select first move from valid_positions
+        min_dist = None
+        for move in valid_dictionary.keys():
+            # find distance to corner and select smallest distance
+            x = move % 8 # horizontal distance
+            y = move // 8 # veritical distance
+            dist = x + y # Manhattan distance
+            #dist = pow(x**2 + y**2, 0.5) # Euclidean distance
+            if (min_dist == None or dist < min_dist):
+                min_dist = dist
+                move_choices = []
+                move_choices.append(move)
+            elif (dist > min_dist):
+                continue
+            else: # dist = min_dist
+                move_choices.append(move)
+            # End if
+        # End for
+        move_choice = random.choice(move_choices)
+
+        #print("Move selected: {0}".format(valid_positions[move_numbers.index(move_choice)]))
+        return move_choice
+    # End Tina
+
     # Select move with most possible flips (choose randomly if multiple)
     # Parameters:
     #   valid_dictionary = dictionary;
