@@ -8,7 +8,7 @@ import random
 # All functions/methods related to operating the game board
 class GameBoard:
     # Create game board variables and state
-    def __init__(self, b = None, w = None):
+    def __init__(self, b = None, w = None, p = 0):
         self.__board_size = 8 # Size of board (size x size)
         self.board_positions = [] # possible board selections
         self.__row_names = ["A", "B", "C", "D", "E", "F", "G", "H"]
@@ -20,6 +20,7 @@ class GameBoard:
         # End for row
         self.black = 0x0
         self.white = 0x0
+        self.player = p
         # Initialize state of board
         self.InitializeBoard(b, w)
 
@@ -30,18 +31,17 @@ class GameBoard:
     #   b = int; bit map of black stones on the board
     #   w = int; bit map of white stones on the board
     def InitializeBoard(self, b = None, w = None):
-        if (b == None or w == None):
-            # Starting position for game
+        if (b == None or w == None or b & w > 0): # Use starting position for game
             self.black = 0x0000000810000000
             self.white = 0x0000001008000000
-        else:
+        else: # Use user-provided initial state
             self.black = b
             self.white = w
         # End if
 
         # basic check for board state (NEEDED HERE?)
-        if (self.black & self.white > 0):
-            print("ERROR: two stones on same square")
+        #if (self.black & self.white > 0):
+        #    print("ERROR: two stones on same square")
         # End if
     # End InitializeBoard
 
@@ -50,11 +50,11 @@ class GameBoard:
     #   player = int; player who is making the next (valid) move
     # Returns:
     #   valid_move_dict = dictionary; dictionary of stones that would be flipped for a given valid move
-    def ValidMoves(self, player):
-        if (player == 1): # Black's turn to make a move
+    def ValidMoves(self):
+        if (self.player == 0): # Black's turn to make a move
             p = self.black
             o = self.white
-        elif (player == 2): # White's turn to make a move
+        elif (self.player == 1): # White's turn to make a move
             p = self.white
             o = self.black
         else:
@@ -113,15 +113,15 @@ class GameBoard:
     # End FindMoves
 
     # Update state of board based on chosen move by player (p)
-    def Update(self, player, move_choice, valid_dictionary):
-        if (player == 1): # Black just made a move
+    def Update(self, move_choice, valid_dictionary):
+        if (self.player == 0): # Black just made a move
             self.black |= (1 << move_choice)
             for flips in valid_dictionary[move_choice]:
                 # Swap opponents stones to player's stones
                 self.black |= (1 << flips)
                 self.white &= ~(1 << flips)
             # End for
-        elif (player == 2): # White just made a move
+        elif (self.player == 1): # White just made a move
             self.white |= (1 << move_choice)
             for flips in valid_dictionary[move_choice]:
                 # Swap opponents stones to player's stones
@@ -132,6 +132,10 @@ class GameBoard:
             return None # A bad error has occured (should make this better)
         # End if
     # End Update
+
+    def NextPlayer(self):
+        self.player ^= 1 # Switch to next player
+    # End NextPlayer
 
     # Displays current state of game board
     def PrintBoard(self):

@@ -71,10 +71,9 @@ def PlayGame(player1_name, player2_name, display_output = True):
     bp = False
     wp = False
     while True:
-        player = 1 # Black's turn
         bp = False # Reset black pass flag
         if display_output: print("Black (X) to move...")
-        valid_dictionary = board.ValidMoves(player)
+        valid_dictionary = board.ValidMoves()
         if (len(valid_dictionary.keys()) == 0): # No valid moves for player, and they must pass
             if display_output: print("No valid moves: Pass")
             bp = True
@@ -82,7 +81,7 @@ def PlayGame(player1_name, player2_name, display_output = True):
             move_choice = Player1(valid_dictionary, board.black, board.white)
             if display_output: print("Move selected: {0}".format(board.board_positions[move_choice]))
             # Update pieces based on move_choice
-            board.Update(player, move_choice, valid_dictionary)
+            board.Update(move_choice, valid_dictionary)
         # End if
         if display_output: board.PrintBoard()
         if bp & display_output: time.sleep(0.3)
@@ -95,11 +94,11 @@ def PlayGame(player1_name, player2_name, display_output = True):
         elif (board.black | board.white == 0xffffffffffffffff): # If board is filled
             break # Black made final move
         # End if
+        board.NextPlayer()
         
-        player = 2 # White's turn
         wp = False # Reset white pass flag
         if display_output: print("White (O) to move...")
-        valid_dictionary = board.ValidMoves(player)
+        valid_dictionary = board.ValidMoves()
         if (len(valid_dictionary.keys()) == 0): # No valid moves for player, and they must pass
             if display_output: print("No valid moves: Pass")
             wp = True
@@ -108,7 +107,7 @@ def PlayGame(player1_name, player2_name, display_output = True):
             if display_output: print("Move selected: {0}".format(board.board_positions[move_choice]))
         
             # Update pieces based on move_choice
-            board.Update(player, move_choice, valid_dictionary)
+            board.Update(move_choice, valid_dictionary)
         # End if
         if display_output: board.PrintBoard()
         if wp & display_output: time.sleep(0.3)
@@ -121,6 +120,7 @@ def PlayGame(player1_name, player2_name, display_output = True):
         elif (board.black | board.white == 0xffffffffffffffff): # If board is filled
             break # White made final move
         # End if
+        board.NextPlayer()
     # End while
     
     # Declare winner
