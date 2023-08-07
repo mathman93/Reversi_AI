@@ -94,7 +94,7 @@ def PlayGame(player1_name, player2_name, display_output = True):
         elif (board.black | board.white == 0xffffffffffffffff): # If board is filled
             break # Black made final move
         # End if
-        board.NextPlayer()
+        board.NextPlayer() # Switch to next player
         
         wp = False # Reset white pass flag
         if display_output: print("White (O) to move...")
@@ -120,7 +120,7 @@ def PlayGame(player1_name, player2_name, display_output = True):
         elif (board.black | board.white == 0xffffffffffffffff): # If board is filled
             break # White made final move
         # End if
-        board.NextPlayer()
+        board.NextPlayer() # Switch to next player
     # End while
     
     # Declare winner
